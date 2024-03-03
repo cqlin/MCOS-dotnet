@@ -1,0 +1,29 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeFile="MCOSMasterPage.master.cs" Inherits="MasterPages_MCOSMasterPage" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1" runat="server">   
+    <title>MCOS</title>
+    <link href="../Styles/main.css" rel="stylesheet" /> 
+    <link href="../Styles/bootstrap.min.css" rel="stylesheet" />
+    <link href="../Styles/jquery-ui.css" rel="stylesheet" /> 
+    
+    <script src="../Scripts/jquery.min.js" type="text/javascript"></script>
+    <script src="../Scripts/jquery-ui.min.js" type="text/javascript"></script>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div id="header">	   
+	        <p>CBCM Meal Card Operations System &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+               <asp:Label ID="txtMcosName" runat="server"></asp:Label>  </p>    
+        </div>
+   
+        <asp:ContentPlaceHolder id="MenuContentPlaceHolder" runat="server"></asp:ContentPlaceHolder>
+   
+        <div id="footer">
+	        <p> Copyright 2015 Chinese Bible Church of Maryland.  </p>
+        </div> 
+    </form>      
+</body>   
+</html>

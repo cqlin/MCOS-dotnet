@@ -1,0 +1,46 @@
+﻿<%@ Master Language="C#" MasterPageFile="~/MasterPages/MCOSMasterPage.master" AutoEventWireup="true" CodeFile="MenuMasterPage.master.cs" Inherits="MasterPages_MenuMasterPage" %>
+
+ 
+<asp:Content ID="Content1" ContentPlaceHolderID="MenuContentPlaceHolder" runat="Server">
+    <div id="container">
+        <table>
+            <tr style="vertical-align:top">
+                <td style="width:256px">
+                    <div id="left_column" style="padding-top: 0px;">
+                        <asp:ScriptManager ID="ScriptManager" runat="server"></asp:ScriptManager>
+                        <div>
+                            <asp:Menu ID="Menu1" runat="server" EnableViewState="False" SkipLinkText="" BackColor="228, 236, 223" Width="100%">
+                                <Items>
+                                    <asp:MenuItem Text="Home" Value="Home" NavigateUrl="../Default.aspx" ImageUrl="~/Images/home-black.png" />
+                                    <asp:MenuItem Text="Lunch Order" Value="MCOS_USER" NavigateUrl="../LunchOrder.aspx" ImageUrl="~/Images/lunch-black.png" />
+                                    <asp:MenuItem Text="Deposit" Value="MCOS_DEPOSIT" NavigateUrl="../NewDeposit.aspx" ImageUrl="~/Images/deposit-black.png"  />
+                                    <asp:MenuItem Text="Sunday Reports" Value="MCOS_ADMIN" NavigateUrl="../Report.aspx" ImageUrl="~/Images/report-black.png" />
+                                    <asp:MenuItem Text="Combine Report" Value="MCOS_ADMIN" NavigateUrl="../Nest.aspx" ImageUrl="~/Images/report-black.png" />
+                                    <asp:MenuItem Text="Search Members" Value="MCOS_USER" NavigateUrl="../SearchMembers.aspx" ImageUrl="~/Images/search-black.png"  />
+                                    <asp:MenuItem Text="My Account" Value="MCOS_USER" NavigateUrl="../MyAccount.aspx" ImageUrl="~/Images/account-black.png"  />
+                                    <asp:MenuItem Text="Logout" NavigateUrl="../Logout.aspx" ImageUrl="~/Images/logout-black.png" />
+                                </Items>
+                            </asp:Menu>
+                        </div>
+                        <div>	    
+                            <br /> 
+                            <asp:Image Id="imageFamily" ImageUrl="<%= familyPicUrl %>" Width ="254px" Height ="183px" runat="server" ImageAlign="Left" OnDataBinding="Page_Load"/>
+                        </div>
+                    </div> 
+                </td>
+                <td>
+                    <div id="right_column">
+                        <asp:ContentPlaceHolder ID="MCOSContentPlaceHolder" runat="server"></asp:ContentPlaceHolder>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    
+    <script>
+        $(document).ready(function () {
+            $("#left_column ul").width("100%");
+        });
+    </script>
+
+</asp:Content>

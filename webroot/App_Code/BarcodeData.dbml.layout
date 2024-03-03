@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 8.75" name="BarcodeData">
+  <DataContextMoniker Name="/BarcodeDataDataContext" />
+  <nestedChildShapes>
+    <classShape Id="30a80e04-0c3a-4a6b-a215-d45158664b75" absoluteBounds="1, 6, 2, 2.3478011067708335">
+      <DataClassMoniker Name="/BarcodeDataDataContext/MenuItem" />
+      <nestedChildShapes>
+        <elementListCompartment Id="140da973-f710-44f2-8a2d-d7c05f4b25d2" absoluteBounds="1.0150000000000001, 6.46, 1.9700000000000002, 1.7878011067708335" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="d116cb49-457b-41ec-8d47-57de452207ff" absoluteBounds="4.25, 6.875, 2, 1.5785953776041666">
+      <DataClassMoniker Name="/BarcodeDataDataContext/OrderDetail" />
+      <nestedChildShapes>
+        <elementListCompartment Id="bd91a878-de9d-41cb-b0ed-faead3578b5e" absoluteBounds="4.265, 7.335, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(3 : 7.61140055338542); (4.25 : 7.61140055338542)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+      <AssociationMoniker Name="/BarcodeDataDataContext/MenuItem/MenuItem_OrderDetail" />
+      <nodes>
+        <classShapeMoniker Id="30a80e04-0c3a-4a6b-a215-d45158664b75" />
+        <classShapeMoniker Id="d116cb49-457b-41ec-8d47-57de452207ff" />
+      </nodes>
+    </associationConnector>
+    <classShape Id="edb31d8a-5c48-45e0-8c98-5be9f1a24e06" absoluteBounds="5.75, 0.5, 2, 2.7324039713541666">
+      <DataClassMoniker Name="/BarcodeDataDataContext/Member" />
+      <nestedChildShapes>
+        <elementListCompartment Id="ce63a98a-55ce-4d52-9e20-6f789dbf357e" absoluteBounds="5.765, 0.96, 1.9700000000000002, 2.1724039713541665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="d7d4b24f-5587-408b-a20a-8e584a8d2878" absoluteBounds="3, 0.5, 2, 3.3093082682291666">
+      <DataClassMoniker Name="/BarcodeDataDataContext/Family" />
+      <nestedChildShapes>
+        <elementListCompartment Id="fc2917e1-5eab-44fe-97cf-70a279fd9711" absoluteBounds="3.0149999999999997, 0.96, 1.9700000000000002, 2.7493082682291665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(5 : 1.86620198567708); (5.75 : 1.86620198567708)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+      <AssociationMoniker Name="/BarcodeDataDataContext/Family/Family_Member" />
+      <nodes>
+        <classShapeMoniker Id="d7d4b24f-5587-408b-a20a-8e584a8d2878" />
+        <classShapeMoniker Id="edb31d8a-5c48-45e0-8c98-5be9f1a24e06" />
+      </nodes>
+    </associationConnector>
+    <classShape Id="3383b931-a5ed-4682-9974-367c357dbe94" absoluteBounds="1.125, 4.25, 2, 1.1939925130208333">
+      <DataClassMoniker Name="/BarcodeDataDataContext/Param" />
+      <nestedChildShapes>
+        <elementListCompartment Id="6b365ccc-d856-47fa-b693-88e69b9d8edb" absoluteBounds="1.1400000000000001, 4.71, 1.9700000000000002, 0.63399251302083326" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="b9d0246a-634f-4de7-bb15-c39e8b6707e2" absoluteBounds="0.5, 1.25, 2, 2.5401025390625">
+      <DataClassMoniker Name="/BarcodeDataDataContext/DepositHistory" />
+      <nestedChildShapes>
+        <elementListCompartment Id="11d51a9b-79a1-4cd2-a85b-08c209ebdc04" absoluteBounds="0.515, 1.71, 1.9700000000000002, 1.9801025390625" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(3 : 2.52005126953125); (2.5 : 2.52005126953125)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/BarcodeDataDataContext/Family/Family_DepositHistory" />
+      <nodes>
+        <classShapeMoniker Id="d7d4b24f-5587-408b-a20a-8e584a8d2878" />
+        <classShapeMoniker Id="b9d0246a-634f-4de7-bb15-c39e8b6707e2" />
+      </nodes>
+    </associationConnector>
+    <classShape Id="efc40058-8301-46d2-8050-44f7dda05c50" absoluteBounds="5.375, 4, 2, 2.3478011067708335">
+      <DataClassMoniker Name="/BarcodeDataDataContext/Order" />
+      <nestedChildShapes>
+        <elementListCompartment Id="5b117021-83d4-4a8c-afd4-2ea42b18f380" absoluteBounds="5.39, 4.46, 1.9700000000000002, 1.7878011067708335" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(5.8125 : 6.34780110677083); (5.8125 : 6.875)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/BarcodeDataDataContext/Order/Order_OrderDetail" />
+      <nodes>
+        <classShapeMoniker Id="efc40058-8301-46d2-8050-44f7dda05c50" />
+        <classShapeMoniker Id="d116cb49-457b-41ec-8d47-57de452207ff" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(6.5625 : 3.23240397135417); (6.5625 : 4)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/BarcodeDataDataContext/Member/Member_Order" />
+      <nodes>
+        <classShapeMoniker Id="edb31d8a-5c48-45e0-8c98-5be9f1a24e06" />
+        <classShapeMoniker Id="efc40058-8301-46d2-8050-44f7dda05c50" />
+      </nodes>
+    </associationConnector>
+  </nestedChildShapes>
+</ordesignerObjectsDiagram>

@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="MCOS" Class="BarcodeDataDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="WebSettings" ConnectionString="Data Source=SQLDB;Initial Catalog=MCOS;Persist Security Info=True;User ID=mcosapp" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="MCOSConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.MenuItem" Member="MenuItems">
+    <Type Name="MenuItem">
+      <Column Name="ItemID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ItemStartDate" Type="System.DateTime" DbType="Date" CanBeNull="true" />
+      <Column Name="ItemEndDate" Type="System.DateTime" DbType="Date" CanBeNull="true" />
+      <Column Name="ItemPrice" Type="System.Decimal" DbType="Decimal(8,2)" CanBeNull="true" />
+      <Column Name="Itemcode" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="ItemDescription" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="CREATE_DATE" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="UPDATE_DATE" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Association Name="MenuItem_OrderDetail" Member="OrderDetails" ThisKey="ItemID" OtherKey="ItemID" Type="OrderDetail" />
+    </Type>
+  </Table>
+  <Table Name="dbo.OrderDetail" Member="OrderDetails">
+    <Type Name="OrderDetail">
+      <Column Name="OrderDetailID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="OrderID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ItemID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ItemQuantity" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="MenuItem_OrderDetail" Member="MenuItem" ThisKey="ItemID" OtherKey="ItemID" Type="MenuItem" IsForeignKey="true" />
+      <Association Name="Order_OrderDetail" Member="Order" ThisKey="OrderID" OtherKey="OrderID" Type="Order" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Member" Member="Members">
+    <Type Name="Member">
+      <Column Name="MEMBER_ID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="MemberCode" Type="System.String" DbType="NVarChar(10) NOT NULL" CanBeNull="false" />
+      <Column Name="FAMILY_ID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="CHINESE_NAME" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="LAST_NAME" Type="System.String" DbType="NVarChar(80)" CanBeNull="true" />
+      <Column Name="FIRST_NAME" Type="System.String" DbType="NVarChar(80)" CanBeNull="true" />
+      <Column Name="CELL_PHONE" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="EMAIL" Type="System.String" DbType="VarChar(80)" CanBeNull="true" />
+      <Column Name="CREATE_DATE" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="UPDATE_DATE" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Association Name="Member_Order" Member="Orders" ThisKey="MEMBER_ID" OtherKey="Member_ID" Type="Order" />
+      <Association Name="Family_Member" Member="Family" ThisKey="FAMILY_ID" OtherKey="FAMILY_ID" Type="Family" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Family" Member="Families">
+    <Type Name="Family">
+      <Column Name="FAMILY_ID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="PUBLISH" Type="System.Char" DbType="Char(1)" CanBeNull="true" />
+      <Column Name="NAME" Type="System.String" DbType="NVarChar(80)" CanBeNull="true" />
+      <Column Name="ADDRESS" Type="System.String" DbType="NVarChar(80)" CanBeNull="true" />
+      <Column Name="CITY" Type="System.String" DbType="NVarChar(80)" CanBeNull="true" />
+      <Column Name="STATE" Type="System.String" DbType="NVarChar(2)" CanBeNull="true" />
+      <Column Name="ZIP" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="HOME_PHONE" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="EMAIL" Type="System.String" DbType="VarChar(80)" CanBeNull="true" />
+      <Column Name="FamilyPicture" Type="System.String" DbType="VarChar(10)" CanBeNull="true" />
+      <Column Name="Balance" Type="System.Decimal" DbType="Decimal(8,2)" CanBeNull="true" />
+      <Column Name="CREATE_DATE" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="UPDATE_DATE" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Association Name="Family_Member" Member="Members" ThisKey="FAMILY_ID" OtherKey="FAMILY_ID" Type="Member" />
+      <Association Name="Family_DepositHistory" Member="DepositHistories" ThisKey="FAMILY_ID" OtherKey="Family_ID" Type="DepositHistory" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Param" Member="Params">
+    <Type Name="Param">
+      <Column Name="PARAM_NAME" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="PARAM_VALUE" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.DepositHistory" Member="DepositHistories">
+    <Type Name="DepositHistory">
+      <Column Name="DepositID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="DepositType" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="Family_ID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="DepositAmount" Type="System.Decimal" DbType="Decimal(8,2)" CanBeNull="true" />
+      <Column Name="USERNAME" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="CREATE_DATE" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="NOTIFIED_DATE" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="Balance" Type="System.Decimal" DbType="Decimal(8,2)" CanBeNull="true" />
+      <Column Name="Member_ID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="Family_DepositHistory" Member="Family" ThisKey="Family_ID" OtherKey="FAMILY_ID" Type="Family" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Orders" Member="Orders">
+    <Type Name="Order">
+      <Column Name="OrderID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Member_ID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="OrderDate" Type="System.DateTime" DbType="Date" CanBeNull="true" />
+      <Column Name="OrderAmount" Type="System.Decimal" DbType="Decimal(8,2)" CanBeNull="true" />
+      <Column Name="USERNAME" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="CREATE_DATE" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="NOTIFIED_DATE" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="Balance" Type="System.Decimal" DbType="Decimal(8,2)" CanBeNull="true" />
+      <Association Name="Order_OrderDetail" Member="OrderDetails" ThisKey="OrderID" OtherKey="OrderID" Type="OrderDetail" />
+      <Association Name="Member_Order" Member="Member" ThisKey="Member_ID" OtherKey="MEMBER_ID" Type="Member" IsForeignKey="true" />
+    </Type>
+  </Table>
+</Database>
