@@ -23,14 +23,51 @@ public partial class Login : System.Web.UI.Page
         // only select first element
         thisParam = manager.SelectFirstParameter();
     }
- 
 
     protected void btnLogin_Click(object sender, EventArgs e)
     { 
-        string loginURL = thisParam.PARAM_VALUE + txtUserName.Text + "&password=" + txtPassword.Text;
-      
         try
         {
+			string name;
+			int member;
+			/*
+            if (txtUserName.Text.ToUpper() == "REMLUNCH" && txtPassword.Text == "REMLUNCH")
+            {
+                List<string> RoleNames = new List<string>();
+                RoleNames.Add("MCOS_ADMIN");
+
+                Session["SessionRoles"] = RoleNames;
+                Session["SessionOperator"] = "David King";
+                Session["SessionMemberID"] = "1";
+
+                if (RoleNames == null)                
+                    statusMessage.Text = "You don't have MCOS role to login.";              
+                else
+                    Server.Transfer("~/Default.aspx");
+            }
+			else
+			*/
+			if(manager.loginUser(txtUserName.Text,txtPassword.Text,out name,out member))
+			{
+				List<string> RoleNames = manager.getUserRole(txtUserName.Text);
+                Session["SessionRoles"] = RoleNames;
+                Session["SessionOperator"] = name;
+                Session["SessionMemberID"] = member;
+                Session["SessionUser"] = txtUserName.Text;
+                statusMessage.Text = "Got:"+name+","+member;              
+                if (!RoleNames.Any())                
+                    statusMessage.Text = "You don't have MCOS role to login.";              
+                else
+					Server.Transfer("~/Default.aspx");
+			}
+            else
+            {
+                statusMessage.Text = "Failed to login: ";
+                errorMessage.Text = "invalid password";         
+            }
+
+            /** CBCM integrated login
+            string loginURL = thisParam.PARAM_VALUE + txtUserName.Text + "&password=" + txtPassword.Text;
             var syncClient = new WebClient();
             var content = syncClient.DownloadString(loginURL);
             //     statusMessage.Text = content.ToString();
@@ -69,6 +106,7 @@ public partial class Login : System.Web.UI.Page
                 else
                     Server.Transfer("~/Default.aspx");
             }
+            */
         }
         catch (Exception ex)
         {

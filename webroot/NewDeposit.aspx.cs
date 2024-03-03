@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.Web.Hosting;
   
 
 public partial class NewDeposit : System.Web.UI.Page
@@ -19,6 +23,7 @@ public partial class NewDeposit : System.Web.UI.Page
     string SMTPUSER_Value;
     string SMTPPASS_Value;
     string SMTPFROM_Value;
+    string SMTPFROM_Name;
     string SMTPBCC_Value;
     string SMTPAUTH_Value;
     string SMTP_DEPOSIT_SUBJECT_Value;
@@ -40,6 +45,7 @@ public partial class NewDeposit : System.Web.UI.Page
             manager.getParamValueByParamName(PList, "SMTPUSER", out SMTPUSER_Value);
             manager.getParamValueByParamName(PList, "SMTPPASS", out SMTPPASS_Value);
             manager.getParamValueByParamName(PList, "SMTPFROM", out SMTPFROM_Value);
+            manager.getParamValueByParamName(PList, "SMTPFROM_NAME", out SMTPFROM_Name);
             manager.getParamValueByParamName(PList, "SMTPBCC", out SMTPBCC_Value);
             manager.getParamValueByParamName(PList, "SMTPAUTH", out SMTPAUTH_Value);
             manager.getParamValueByParamName(PList, "SMTP_DEPOSIT_SUBJECT", out SMTP_DEPOSIT_SUBJECT_Value);
@@ -50,6 +56,7 @@ public partial class NewDeposit : System.Web.UI.Page
             Session["SMTPUSER_Value"] = SMTPUSER_Value;
             Session["SMTPPASS_Value"] = SMTPPASS_Value;
             Session["SMTPFROM_Value"] = SMTPFROM_Value;
+            Session["SMTPFROM_Name"] = SMTPFROM_Name;
             Session["SMTPBCC_Value"] = SMTPBCC_Value;
             Session["SMTPAUTH_Value"] = SMTPAUTH_Value;
             Session["SMTP_DEPOSIT_SUBJECT_Value"] = SMTP_DEPOSIT_SUBJECT_Value;
@@ -69,6 +76,7 @@ public partial class NewDeposit : System.Web.UI.Page
     {
         txtDepositAmount.Text = "";
         txtBarcode.Focus();
+		lblTotal.Text = "";
     }
 
 
@@ -86,6 +94,7 @@ public partial class NewDeposit : System.Web.UI.Page
     {
         txtDepositAmount.Text = "";
         lblStatus.Text = "";
+		lblError.Text = "";
         txtAfterDeposit.Text = "";
         lblBeforeDeposit.Text = "";
         lblAfterDeposit.Text = "";
@@ -123,7 +132,7 @@ public partial class NewDeposit : System.Web.UI.Page
             e.Row.Cells[2].HorizontalAlign = HorizontalAlign.Right;
     }
 
-    protected void SendEmail(string fEmail)
+    protected void SendEmail(string fEmail) 
     {
         MailMessage mail = new MailMessage();
 
@@ -132,24 +141,26 @@ public partial class NewDeposit : System.Web.UI.Page
         SMTPUSER_Value = Session["SMTPUSER_Value"].ToString();
         SMTPPASS_Value = Session["SMTPPASS_Value"].ToString();
         SMTPFROM_Value = Session["SMTPFROM_Value"].ToString();
+        SMTPFROM_Name = Session["SMTPFROM_Name"].ToString();
         SMTPBCC_Value = Session["SMTPBCC_Value"].ToString();
         SMTPAUTH_Value = Session["SMTPAUTH_Value"].ToString();
         SMTP_DEPOSIT_SUBJECT_Value = Session["SMTP_DEPOSIT_SUBJECT_Value"].ToString();
-
+		
         try
         {
-            mail.To.Add(new MailAddress(fEmail));
-            mail.From = new MailAddress(SMTPFROM_Value);
-            mail.Bcc.Add(new MailAddress(SMTPBCC_Value));
-
-            mail.Subject = SMTP_DEPOSIT_SUBJECT_Value + " " + DateTime.Today.Date.ToString("MM/dd/yyyy");
-
+			System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;//Need to have this, otherwise doesn't work
+			
             string mName1 = Session["MemberName"].ToString();
             string mCode1 = Session["MemberSessionCode"].ToString();
             string strDeposit1 = Session["Deposit"].ToString();
             string strBalance1 = Session["Balance"].ToString();
 
             string strBody = PopulateBody(mName1, mCode1, strBalance1, strDeposit1);
+            mail.To.Add(new MailAddress(fEmail, mName1));
+            mail.From = new MailAddress(SMTPFROM_Value, SMTPFROM_Name);
+            mail.Bcc.Add(new MailAddress(SMTPBCC_Value));
+
+            mail.Subject = SMTP_DEPOSIT_SUBJECT_Value + " " + DateTime.Today.Date.ToString("MM/dd/yyyy");
             mail.Body = strBody;
 
             mail.IsBodyHtml = true;
@@ -157,18 +168,21 @@ public partial class NewDeposit : System.Web.UI.Page
             SmtpClient smtp = new SmtpClient();
             smtp.Host = SMTPSRV_Value;
             smtp.Port = Convert.ToInt32(SMTPPORT_Value);
+			smtp.EnableSsl = true;
+			smtp.UseDefaultCredentials = false;
 
-            if (SMTPAUTH_Value == "Y")
+            if (SMTPAUTH_Value == "Y"){
                 smtp.Credentials = new NetworkCredential(SMTPUSER_Value, SMTPPASS_Value);
-
-            smtp.Send(mail);
+				//await Task.Delay(30000);
+				//Thread.Sleep(30000);
+				//await smtp.SendMailAsync(mail);
+				smtp.Send(mail);
+			}
         }
-
         catch (Exception ex)
         {
-            throw ex;
+           throw ex;
         }
-
         finally
         {
             if (mail != null)
@@ -197,6 +211,17 @@ public partial class NewDeposit : System.Web.UI.Page
 
     protected void txtBarcode_TextChanged(object sender, EventArgs e)
     {
+		List<string> UserRoles = (List<string>)Session["SessionRoles"];
+        if (!UserRoles.Contains("MCOS_DEPOSIT") && !UserRoles.Contains("MCOS_ADMIN")){
+            txtBarcode.Focus();
+            CleanSession();
+            this.txtBarcode.TextChanged -= txtBarcode_TextChanged;
+			//Response.Redirect(Request.Url.PathAndQuery);
+			lblStatus.ForeColor = System.Drawing.Color.Red;
+            lblStatus.Text = "Unauthorized.";
+			return;
+		}
+		
         String barcode = txtBarcode.Text.ToUpper();
         String firstBarcode = "";
 
@@ -268,10 +293,12 @@ public partial class NewDeposit : System.Web.UI.Page
         }
     }
   
-
     protected void btnAddDeposit_Click(object sender, EventArgs e)
     {
-        if (Session["DepositComplete"] != null)
+ 		Stopwatch stopWatch = new Stopwatch();
+		stopWatch.Start();
+
+       if (Session["DepositComplete"] != null)
         {
             lblStatus.ForeColor = System.Drawing.Color.Red;
             lblStatus.Text = " Error: Deposit is already complete.";
@@ -305,50 +332,74 @@ public partial class NewDeposit : System.Web.UI.Page
                     } 
                     else
                     {
-                        manager.InsertDepositHistory(Convert.ToInt32(Session["MemberID"]), Convert.ToInt32(Session["FamilyID"]), Decimal.Parse(txtDepositAmount.Text), DropDownDepositType.Text, Session["SessionOperator"].ToString());
+						try
+						{
+							manager.InsertDepositHistory(Convert.ToInt32(Session["MemberID"]), Convert.ToInt32(Session["FamilyID"]), Decimal.Parse(txtDepositAmount.Text), DropDownDepositType.Text, Session["SessionOperator"].ToString());
 
-                        if (!manager.UpdateBalance(Convert.ToInt32(Session["FamilyID"]), decimal.Parse(txtDepositAmount.Text)))
-                        {
-                            lblStatus.ForeColor = System.Drawing.Color.Red;
-                            lblStatus.Text = " Not enough Money to withdraw. Please re-do. ";
-                        }
-                        else
-                        {
+							if (!manager.UpdateBalance(Convert.ToInt32(Session["FamilyID"]), decimal.Parse(txtDepositAmount.Text)))
+							{
+								lblStatus.ForeColor = System.Drawing.Color.Red;
+								lblStatus.Text = " Not enough Money to withdraw. Please re-do. ";
+							}
+							else
+							{
+								var query = manager.SelectMemberFamily(Convert.ToInt32(Session["MemberID"]));
+								lblAfterDeposit.Text = "After Deposit: ";
+								gridNewDeposits.DataSource = query;
+								gridNewDeposits.DataBind();
 
-                            var query = manager.SelectMemberFamily(Convert.ToInt32(Session["MemberID"]));
-                            lblAfterDeposit.Text = "After Deposit: ";
-                            gridNewDeposits.DataSource = query;
-                            gridNewDeposits.DataBind();
+								txtAfterDeposit.Text = "$" + txtDepositAmount.Text + " added. Your Current Balance is $" +
+														   gridNewDeposits.Rows[0].Cells[2].Text + ".";
 
-                            txtAfterDeposit.Text = "$" + txtDepositAmount.Text + " added. Your Current Balance is $" +
-                                                       gridNewDeposits.Rows[0].Cells[2].Text + ".";
+								Session["Balance"] = gridNewDeposits.Rows[0].Cells[2].Text;
+								Session["Deposit"] = txtDepositAmount.Text;
 
-                            Session["Balance"] = gridNewDeposits.Rows[0].Cells[2].Text;
-                            Session["Deposit"] = txtDepositAmount.Text;
+								var dHistory = manager.SelectRecentFamilyAccountActivitiesByFID(Convert.ToInt32(Session["FamilyID"]));
+								lblDepositHistory.Text = "Deposit History: ";
+								gvDepositHistory.DataSource = dHistory;
+								gvDepositHistory.DataBind();
+								
+								lblError.Text = "";
+							   if (Session["FamilyEmail"] != null)
+							   {
+								   HostingEnvironment.QueueBackgroundWorkItem(ct => SendEmail(Session["FamilyEmail"].ToString()));
+								   ;//SendEmail(Session["FamilyEmail"].ToString());
+							   }
+							   else
+							   {
+								   lblStatus.ForeColor = System.Drawing.Color.Black;
+								   lblStatus.Text = "You haven’t set up your email yet. Please set up your email with Admin.";
+							   }
+								lblStatus.ForeColor = System.Drawing.Color.YellowGreen;
+								lblStatus.Text = " Your Deposit is complete.";
+								Session["DepositComplete"] = "DepositComplete";
+								CleanAmount();
+							}
+						}
+						catch (Exception ex)
+						{
+							string errormessage = String.Format("Error: {0} StackTrace: {1}, {2}", ex.Message, ex.StackTrace, ex.ToString());
+							lblStatus.ForeColor = System.Drawing.Color.Red;
+							lblStatus.Text = "Error";
+							lblError.Text += errormessage;
+						}
 
-                            var dHistory = manager.SelectRecentFamilyAccountActivitiesByFID(Convert.ToInt32(Session["FamilyID"]));
-                            lblDepositHistory.Text = "Deposit History: ";
-                            gvDepositHistory.DataSource = dHistory;
-                            gvDepositHistory.DataBind();
-
-//                            if (Session["FamilyEmail"] != null)
-//                                SendEmail(Session["FamilyEmail"].ToString());
-//                            else
-//                            {
-//                                lblStatus.ForeColor = System.Drawing.Color.Black;
-//                                lblStatus.Text = "You haven’t set up your email yet. Please set up your email with Admin.";
-//                            }
-                            lblStatus.ForeColor = System.Drawing.Color.YellowGreen;
-                            lblStatus.Text = " Your Deposit is complete.";
-                            Session["DepositComplete"] = "DepositComplete";
-                            CleanAmount();
-                        }
                     }
                 }
             }
         }
+		stopWatch.Stop();
+		ElapsedTimeLabel.Text = String.Format("Elapsed deposit time: {0}", stopWatch.ElapsedMilliseconds / 1000.0);
     }
 
+	protected void btnTotal_Click(object sender, EventArgs e)
+    {
+		lblTotal.Text = "";
+
+		List<string> totals = manager.getTotalDeposit(Session["SessionOperator"].ToString());
+		lblTotal.ForeColor = System.Drawing.Color.Green;
+		lblTotal.Text = "Total:"+string.Join(",",totals);
+    }
 
     public bool IsDecimal(string stringInput)
     {

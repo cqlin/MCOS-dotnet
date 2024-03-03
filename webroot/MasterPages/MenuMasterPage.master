@@ -18,6 +18,9 @@
                                     <asp:MenuItem Text="Combine Report" Value="MCOS_ADMIN" NavigateUrl="../Nest.aspx" ImageUrl="~/Images/report-black.png" />
                                     <asp:MenuItem Text="Search Members" Value="MCOS_USER" NavigateUrl="../SearchMembers.aspx" ImageUrl="~/Images/search-black.png"  />
                                     <asp:MenuItem Text="My Account" Value="MCOS_USER" NavigateUrl="../MyAccount.aspx" ImageUrl="~/Images/account-black.png"  />
+                                    <asp:MenuItem Text="Add Operator" Value="MCOS_ADMIN" NavigateUrl="../AddUser.aspx" ImageUrl="~/Images/account-black.png"  />
+                                    <asp:MenuItem Text="Check Balance" Value="MCOS_USER" NavigateUrl="../CheckBalance.aspx" ImageUrl="~/Images/account-black.png"  />
+                                    <asp:MenuItem Text="Change Password" Value="MCOS_USER" NavigateUrl="../ChangePassword.aspx" ImageUrl="~/Images/account-black.png"  />
                                     <asp:MenuItem Text="Logout" NavigateUrl="../Logout.aspx" ImageUrl="~/Images/logout-black.png" />
                                 </Items>
                             </asp:Menu>

@@ -15,14 +15,14 @@
 <body>
     <form id="form1" runat="server">
         <div id="header">	   
-	        <p>CBCM Meal Card Operations System &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	        <p>REM Meal Card Operations System &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                <asp:Label ID="txtMcosName" runat="server"></asp:Label>  </p>    
         </div>
    
         <asp:ContentPlaceHolder id="MenuContentPlaceHolder" runat="server"></asp:ContentPlaceHolder>
    
         <div id="footer">
-	        <p> Copyright 2015 Chinese Bible Church of Maryland.  </p>
+	        <p> Copyright 2023 Rockville Evangilical Mission Church.  Credit Chinese Bible Church of Maryland.  </p>
         </div> 
     </form>      
 </body>   

@@ -11,6 +11,5 @@ public partial class MasterPages_MCOSMasterPage : System.Web.UI.MasterPage
     {
         if (Session["SessionOperator"] != null)
             txtMcosName.Text = Session["SessionOperator"].ToString();
-
     }
 }

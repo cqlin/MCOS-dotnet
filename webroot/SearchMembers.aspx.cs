@@ -25,6 +25,14 @@ public partial class SearchMembers : System.Web.UI.Page
   
     protected void Page_Load(object sender, EventArgs e)
     {
+		List<string> UserRoles = (List<string>)Session["SessionRoles"];
+		if (!UserRoles.Contains("MCOS_ADMIN"))
+		{
+			this.txtBarcode.TextChanged -= txtBarcode_TextChanged;
+			lblStatus.ForeColor = System.Drawing.Color.Red;
+			lblStatus.Text = "Unauthorized.";
+			return;
+		}
         if (!IsPostBack)
         {
             txtBarcode.Focus();

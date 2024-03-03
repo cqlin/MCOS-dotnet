@@ -49,6 +49,126 @@ public class AccessData
         } 
     }
 
+    public int UpdateAsstBalance(string name)
+    {
+        using (SqlConnection cn = new SqlConnection(connStr))
+        {
+            SqlCommand cmd = new SqlCommand("update_asst_family_balance", cn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@User", name);            
+            cmd.Parameters.Add("@UpdateResult", SqlDbType.Int).Direction = ParameterDirection.ReturnValue;
+            cn.Open();
+
+            cmd.ExecuteNonQuery();
+            return int.Parse(cmd.Parameters["@UpdateResult"].Value.ToString());
+        }
+    }
+	
+    public bool loginUser(string user, string password, out String name, out int member)
+    {
+        member = 0; 
+		name = "null";
+        
+        using (SqlConnection cn = new SqlConnection(connStr))
+        {
+            SqlCommand cmd = new SqlCommand("select u.[MEMBER_ID],m.FIRST_NAME+' '+m.LAST_NAME "
+			 + "from [MCOS].[dbo].[users] u join [MCOS].[dbo].[Member] m on u.MEMBER_ID=m.MEMBER_ID "
+			 + "where [User_Name]=@user and [Password]=HashBytes('SHA2_256', @pass)", cn);
+            cmd.Parameters.AddWithValue("@user", user);            
+            cmd.Parameters.AddWithValue("@pass", password);
+			//SqlCommand cmd = new SqlCommand("select 1,'David.King' ",cn);
+			cn.Open();
+
+			SqlDataReader reader = cmd.ExecuteReader();
+			while (reader.Read())
+			{
+				member = (int)reader[0];
+				name = (string)reader[1];
+			}
+			reader.Close();
+        }
+		if(member>0)
+			return true;
+		else
+			return false;
+    }
+
+    public int changePassword(string user, string oldPassword, string newPassword)
+    {
+        using (SqlConnection cn = new SqlConnection(connStr))
+        {
+            SqlCommand cmd = new SqlCommand("update [MCOS].[dbo].[users] set [Password]=HashBytes('SHA2_256', @newpass) "
+			 + "where [User_Name]=@user and [Password]=HashBytes('SHA2_256', @oldpass)", cn);
+            cmd.Parameters.AddWithValue("@user", user);            
+            cmd.Parameters.AddWithValue("@oldpass", oldPassword);
+			cmd.Parameters.AddWithValue("@newpass", newPassword);
+			cn.Open();
+
+			return cmd.ExecuteNonQuery();
+        }
+    }
+	
+    public int addUser(string user, string member, string password, string role)
+    {
+		int ret = 0;
+        using (SqlConnection cn = new SqlConnection(connStr))
+        {
+            SqlCommand cmd = new SqlCommand("insert into [MCOS].[dbo].[users] ([User_Name],[Password],[MEMBER_ID],[CREATE_DATE],[UPDATE_DATE]) "
+			+ "values (@user,HashBytes('SHA2_256', @pass),@member,GETDATE(),GETDATE())", cn);
+            cmd.Parameters.AddWithValue("@user", user);            
+            cmd.Parameters.AddWithValue("@pass", password);
+			cmd.Parameters.AddWithValue("@member", member);
+			cn.Open();
+
+			ret = cmd.ExecuteNonQuery();
+			cmd = new SqlCommand("insert into [MCOS].[dbo].[user_roles] ([User_Name],[Role]) values (@user,@role)", cn);
+			cmd.Parameters.AddWithValue("@user", user);            
+            cmd.Parameters.AddWithValue("@role", role);
+			ret = cmd.ExecuteNonQuery();
+        }
+		return ret;
+    }
+	
+    public List<string> getUserRole(string user)
+    {
+        List<string> RoleNames = new List<string>();
+        
+        using (SqlConnection cn = new SqlConnection(connStr))
+        {
+            SqlCommand cmd = new SqlCommand("select [Role] from [MCOS].[dbo].[user_roles] where [User_Name]=@user", cn);
+            cmd.Parameters.AddWithValue("@user", user);            
+			cn.Open();
+
+			SqlDataReader reader = cmd.ExecuteReader();
+			while (reader.Read())
+			{
+				RoleNames.Add((string)reader[0]);
+			}
+			reader.Close();
+        }
+		return RoleNames;
+    }
+	
+    public List<string> getTotalDeposit(string user)
+    {
+        List<string> Totals = new List<string>();
+        
+        using (SqlConnection cn = new SqlConnection(connStr))
+        {
+            SqlCommand cmd = new SqlCommand("SELECT [DepositType],SUM([DepositAmount]) FROM [MCOS].[dbo].[DepositHistory] WHERE [USERNAME] = @user AND [CREATE_DATE] >GETDATE()-0.5 GROUP BY [DepositType]", cn);
+            cmd.Parameters.AddWithValue("@user", user);            
+			cn.Open();
+
+			SqlDataReader reader = cmd.ExecuteReader();
+			while (reader.Read())
+			{
+				Totals.Add((string)reader[0]+":"+reader[1].ToString());
+			}
+			reader.Close();
+        }
+		return Totals;
+    }	
+	
     public void getParamValueByParamName(List<Param> PList, string strpName, out string strpValue)
     {
         List<Param> ParamList = new List<Param>();

@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Deposit" Language="C#" MasterPageFile="~/MasterPages/MenuMasterPage.master" AutoEventWireup="true" CodeFile="NewDeposit.aspx.cs" Inherits="NewDeposit" %>
+﻿<%@ Page Async="true" Title="Deposit" Language="C#" MasterPageFile="~/MasterPages/MenuMasterPage.master" AutoEventWireup="true" CodeFile="NewDeposit.aspx.cs" Inherits="NewDeposit" %>
 <%@ MasterType VirtualPath="~/MasterPages/MenuMasterPage.master" %>
  
 <asp:Content ID="Content2" ContentPlaceHolderID="MCOSContentPlaceHolder" Runat="Server">
@@ -17,7 +17,12 @@
     </script>
 
      <h2>Deposit: &nbsp;&nbsp;&nbsp;&nbsp; Message:<asp:Label ID="lblStatus" runat="server"></asp:Label> </h2><br/>
-    
+	 <asp:Label ID="lblError" runat="server"></asp:Label><br/>
+	 <asp:Label ID="ElapsedTimeLabel" runat="server"></asp:Label><br/>
+	 <div>
+      <span id="TaskMessage" runat="server">
+      </span>
+     </div>
 
      <label>Scan Barcode Here:</label> 
      <asp:TextBox runat="server" style="width:150px; height:40px;" Font-Size="X-Large" 
@@ -42,9 +47,10 @@
     <asp:TextBox ID="txtDepositAmount" style="width:100px; height:40px;" Font-Size="X-Large" runat="server" CssClass="textbox" BackColor="#efefef"></asp:TextBox>
    
     <asp:DropDownList ID="DropDownDepositType" style="width:75px; height:30px;" Font-Size="Large" runat="server">
-                <asp:ListItem Text ="Cash" Value="Cash"></asp:ListItem>
-                <asp:ListItem Text ="Check" Value="Check"></asp:ListItem>
-            </asp:DropDownList>     
+		<asp:ListItem Text ="Cash" Value="Cash"></asp:ListItem>
+		<asp:ListItem Text ="Check" Value="Check"></asp:ListItem>
+		<asp:ListItem Text ="Zelle" Value="Zelle"></asp:ListItem>
+    </asp:DropDownList>
     <asp:Button ID="btnAdd" style="width:150px; height:40px;" Font-Size="X-Large" runat="server" Text="Add Deposit" OnClick="btnAddDeposit_Click" CssClass="textbox" BackColor="#efefef"/><br/> 
          
     <h2><label >&nbsp;&nbsp;&nbsp;&nbsp; </label><asp:Label ID="txtAfterDeposit" runat="server"></asp:Label></h2><br/> 
@@ -76,7 +82,10 @@
         <SortedDescendingCellStyle BackColor="#EAEAD3" />
         <SortedDescendingHeaderStyle BackColor="#575357" />
      </asp:GridView>
-     
+ 
+    <asp:Button ID="btnTotal" style="width:250px; height:30px;" Font-Size="Large" runat="server" Text="Today's Total" OnClick="btnTotal_Click" CssClass="textbox" BackColor="#efefef" /><br /><br /> 
+ 	<asp:Label ID="lblTotal" runat="server"></asp:Label>
+ 
      
 </asp:Content>
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
@@ -8,6 +9,7 @@ using System.Net.Mail;
 using System.Net;
 using System.IO;
 using System.Text;
+using System.Web.Hosting;
   
 
 public partial class LunchOrder : System.Web.UI.Page
@@ -27,12 +29,16 @@ public partial class LunchOrder : System.Web.UI.Page
     string SMTPUSER_Value;
     string SMTPPASS_Value;
     string SMTPFROM_Value;
+    string SMTPFROM_Name;
     string SMTPBCC_Value;
     string SMTPAUTH_Value;
     string SMTP_PURCHASE_SUBJECT_Value;
    
     protected void Page_Load(object sender, EventArgs e)
     {
+        if (Session["SessionRoles"] == null)
+			Response.Redirect("login.aspx");        
+
         if (!IsPostBack)
         {
             txtBarcode.Focus();
@@ -48,6 +54,7 @@ public partial class LunchOrder : System.Web.UI.Page
             manager.getParamValueByParamName(PList, "SMTPUSER", out SMTPUSER_Value);
             manager.getParamValueByParamName(PList, "SMTPPASS", out SMTPPASS_Value);
             manager.getParamValueByParamName(PList, "SMTPFROM", out SMTPFROM_Value);
+            manager.getParamValueByParamName(PList, "SMTPFROM_NAME", out SMTPFROM_Name);
             manager.getParamValueByParamName(PList, "SMTPBCC", out SMTPBCC_Value);
             manager.getParamValueByParamName(PList, "SMTPAUTH", out SMTPAUTH_Value);
             manager.getParamValueByParamName(PList, "SMTP_PURCHASE_SUBJECT", out SMTP_PURCHASE_SUBJECT_Value);
@@ -58,6 +65,7 @@ public partial class LunchOrder : System.Web.UI.Page
             Session["SMTPUSER_Value"] = SMTPUSER_Value;
             Session["SMTPPASS_Value"] = SMTPPASS_Value;
             Session["SMTPFROM_Value"] = SMTPFROM_Value;
+            Session["SMTPFROM_Name"] = SMTPFROM_Name;
             Session["SMTPBCC_Value"] = SMTPBCC_Value;
             Session["SMTPAUTH_Value"] = SMTPAUTH_Value;
             Session["SMTP_PURCHASE_SUBJECT_Value"] = SMTP_PURCHASE_SUBJECT_Value;
@@ -114,8 +122,6 @@ public partial class LunchOrder : System.Web.UI.Page
         lblTotal.Text = Session["total"].ToString();
         lblBalance.Text = Session["Balance"].ToString();
     }
-  
-    
     
     protected void gvOrderMember_RowDataBound(object o, GridViewRowEventArgs e)
     {
@@ -185,17 +191,14 @@ public partial class LunchOrder : System.Web.UI.Page
         SMTPUSER_Value = Session["SMTPUSER_Value"].ToString();
         SMTPPASS_Value = Session["SMTPPASS_Value"].ToString();
         SMTPFROM_Value = Session["SMTPFROM_Value"].ToString();
+        SMTPFROM_Name = Session["SMTPFROM_Name"].ToString();
         SMTPBCC_Value = Session["SMTPBCC_Value"].ToString();        
         SMTPAUTH_Value = Session["SMTPAUTH_Value"].ToString();
         SMTP_PURCHASE_SUBJECT_Value = Session["SMTP_PURCHASE_SUBJECT_Value"].ToString();
 
         try
         {       
-            mail.To.Add(new MailAddress(fEmail));             
-            mail.From = new MailAddress(SMTPFROM_Value);
-            mail.Bcc.Add(new MailAddress(SMTPBCC_Value));
-   
-            mail.Subject = SMTP_PURCHASE_SUBJECT_Value + " " + DateTime.Today.Date.ToString("MM/dd/yyyy");
+			System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;//Need to have this, otherwise doesn't work
 
             string mName1 = Session["MemberName"].ToString();
             string mCode1 = Session["MemberSessionCode"].ToString();
@@ -210,6 +213,12 @@ public partial class LunchOrder : System.Web.UI.Page
                 strReminder = "Your balance is less than $10.";
        
             string strBody = PopulateBody(mName1, mCode1, strBalance1, strTotal1, strOID1, myList, strReminder);
+
+            mail.To.Add(new MailAddress(fEmail, mName1));
+            mail.From = new MailAddress(SMTPFROM_Value, SMTPFROM_Name);
+            mail.Bcc.Add(new MailAddress(SMTPBCC_Value));
+   
+            mail.Subject = SMTP_PURCHASE_SUBJECT_Value + " " + DateTime.Today.Date.ToString("MM/dd/yyyy");
             mail.Body =strBody;
               
             mail.IsBodyHtml = true;
@@ -217,15 +226,19 @@ public partial class LunchOrder : System.Web.UI.Page
             SmtpClient smtp = new SmtpClient();
             smtp.Host = SMTPSRV_Value;
             smtp.Port = Convert.ToInt32(SMTPPORT_Value);
+			smtp.EnableSsl = true;
+			smtp.UseDefaultCredentials = false;
 
-            if (SMTPAUTH_Value == "Y")
-                smtp.Credentials = new NetworkCredential(SMTPUSER_Value, SMTPPASS_Value); 
-           
-            smtp.Send(mail);
+            if (SMTPAUTH_Value == "Y") {
+                smtp.Credentials = new NetworkCredential(SMTPUSER_Value, SMTPPASS_Value);
+				//lblError.Text += "Before send,";
+                smtp.Send(mail);
+				//lblError.Text += "after send,";
+			}
         }
-
         catch (Exception ex)
         {
+			//lblError.Text += ex.ToString();
             throw ex;
         }
 
@@ -529,6 +542,19 @@ public partial class LunchOrder : System.Web.UI.Page
       
     protected void txtBarcode_TextChanged(object sender, EventArgs e)
     {
+		List<string> UserRoles = (List<string>)Session["SessionRoles"];
+        if (!UserRoles.Contains("MCOS_USER") && !UserRoles.Contains("MCOS_ADMIN")){
+            txtBarcode.Focus();
+            CleanSession();
+			CleanScreen();
+            ResetDataList();
+			//this.txtBarcode.TextChanged -= txtBarcode_TextChanged;
+			lblStatus.Text = "Error. Not Authorized.";
+			return;
+		}
+		
+ 		Stopwatch stopWatch = new Stopwatch();
+		stopWatch.Start();
         String barcode = txtBarcode.Text.ToUpper();
 
         statusMessage.Text = "";
@@ -629,11 +655,14 @@ public partial class LunchOrder : System.Web.UI.Page
                             GridViewItemDetail.DataSource = miList;
                             GridViewItemDetail.DataBind();
 
-//                            if (Session["FamilyEmail"] != null)
-//                                SendEmail(Session["FamilyEmail"].ToString());
-//                            else
-//                                statusMessage.Text = "You haven’t set up your email yet. Please set up your email with Admin.";
-
+                            if (Session["FamilyEmail"] != null){
+								//lblError.Text += "Before call send,";
+								//SendEmail(Session["FamilyEmail"].ToString());
+								HostingEnvironment.QueueBackgroundWorkItem(ct => SendEmail(Session["FamilyEmail"].ToString()));
+								//lblError.Text += "after call send,";
+                            }else{
+                               statusMessage.Text = "You haven’t set up your email yet. Please set up your email with Admin.";
+							}
                             lblTotal.Text = Session["total"].ToString();
                             lblBalance.Text = Session["Balance"].ToString();
                             lblStatus.ForeColor = System.Drawing.Color.YellowGreen;
@@ -859,7 +888,9 @@ public partial class LunchOrder : System.Web.UI.Page
                     break;
             }
         }
-    }
+   		stopWatch.Stop();
+		ElapsedTimeLabel.Text = String.Format("Response time: {0}", stopWatch.ElapsedMilliseconds / 1000.0);
+}
 
     protected void btnB0031_Click(object sender, EventArgs e)
     {

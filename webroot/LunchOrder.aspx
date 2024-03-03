@@ -22,6 +22,8 @@
           Total: $<asp:Label ID="lblTotal" runat="server" Text="0.00"></asp:Label>
     </h2><br />     
     <asp:Label ID="lblStatus" runat="server"/> <asp:Label ID="statusMessage" runat="server"  ></asp:Label><br/>
+	 <asp:Label ID="lblError" runat="server"></asp:Label><br/>
+	 <asp:Label ID="ElapsedTimeLabel" runat="server"></asp:Label><br/>
        
     <table>
         <tr>

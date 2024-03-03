@@ -16,9 +16,9 @@
         });
     </script>
     <h2>Sunday Reports</h2> 
-     <h3>Please select Report type and click the button to generate the report that you need.</h3><br/>
+    <h3>Please select Report type and click the button to generate the report that you need.</h3><br/>
 
-     <label for="reportType"> Report Type:  </label>
+    <label for="reportType"> Report Type:  </label>
     <asp:DropDownList ID="ddReportType" style="width:220px; height:30px;" Font-Size="Large" runat="server" CssClass="textbox" BackColor="#efefef"></asp:DropDownList> 
     <asp:Button ID="btnSubmit" style="width:150px; height:30px;" Font-Size="Large" runat="server" Text="Submit" OnClick="btnSubmit_Click" CssClass="textbox" BackColor="#efefef" /><br /><br /> 
   
@@ -45,6 +45,13 @@
             </asp:Panel>
         </ContentTemplate>
         <Triggers><asp:AsyncPostBackTrigger ControlID="btnSubmit"  EventName="Click" /></Triggers>
-    </asp:UpdatePanel>       
-  
+    </asp:UpdatePanel>
+	
+	<br/>
+	<br/>
+ 
+	<asp:Label ID="lblStatus" runat="server"></asp:Label>
+    <asp:Button ID="btnAsst" style="width:250px; height:30px;" Font-Size="Large" runat="server" Text="Top off Assist Account" OnClick="btnAsst_Click" CssClass="textbox" BackColor="#efefef" /><br /><br /> 
+ 	<asp:Label ID="lblAsst" runat="server"></asp:Label>
+
 </asp:Content>

@@ -11,6 +11,13 @@ public partial class Report : System.Web.UI.Page
 
     protected void Page_Load(object sender, EventArgs e)
     {
+		List<string> UserRoles = (List<string>)Session["SessionRoles"];
+		if (!UserRoles.Contains("MCOS_ADMIN"))
+		{
+			this.btnSubmit.Click -= btnSubmit_Click;
+			this.btnExcel.Click -= btnExcel_Click;
+			return;
+		}
         List<Param> PList = new List<Param>();
         PList = (List<Param>)Session["ParamList"];
 
@@ -69,6 +76,12 @@ public partial class Report : System.Web.UI.Page
     //Based on the report user selected, different data will be retrieved
     private void PopulateGrid()
     {
+		List<string> UserRoles = (List<string>)Session["SessionRoles"];
+        if (!UserRoles.Contains("MCOS_ADMIN")){
+			lblStatus.ForeColor = System.Drawing.Color.Red;
+            lblStatus.Text = "Unauthorized.";
+			return;
+		}
         string selectReport = ddReportType.SelectedValue;
 
         object sumOrderToday = null;
@@ -131,5 +144,21 @@ public partial class Report : System.Web.UI.Page
     {
         GridView1.PageIndex = e.NewPageIndex;
         //PopulateGrid();
-    }    
+    }
+	
+	protected void btnAsst_Click(object sender, EventArgs e)
+    {
+		lblAsst.Text = "";
+		List<string> UserRoles = (List<string>)Session["SessionRoles"];
+        if (!UserRoles.Contains("MCOS_ADMIN")){
+			lblAsst.ForeColor = System.Drawing.Color.Red;
+            lblAsst.Text = "Unauthorized.";
+			return;
+		}
+		int ret = manager.UpdateAsstBalance(Session["SessionOperator"].ToString());
+		lblAsst.ForeColor = System.Drawing.Color.Green;
+		lblAsst.Text = "Updated records:"+ret;
+    }
+
+
 }

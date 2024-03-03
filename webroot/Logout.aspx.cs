@@ -11,10 +11,11 @@ public partial class Logout : System.Web.UI.Page
     {
         if (Session["SessionOperator"] != null || Session["SessionRoles"] != null)
         {
-            
             Session["SessionOperator"] = null;
             Session["SessionRoles"] = null;
             Session["MenuList"] = null; 
+            Session["SessionUser"] = null;
+			Session["SessionMemberID"] = null;
 
             /* Starts here */
             Response.Cache.SetCacheability(HttpCacheability.NoCache);
